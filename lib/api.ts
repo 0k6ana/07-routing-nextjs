@@ -2,6 +2,8 @@ import axios from "axios";
 import type { AxiosResponse } from "axios";
 import type { Note, Tag } from "@/types/note";
 
+console.log(process.env.NEXT_PUBLIC_NOTEHUB_TOKEN);
+
 const api = axios.create({
   baseURL: "https://notehub-public.goit.study/api",
   headers: {

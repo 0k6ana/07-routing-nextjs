@@ -1,4 +1,4 @@
-import css from './layout-notes.module.css';
+import css from '../../notes/layout-notes.module.css';
 
 interface LayoutNotesProps {
   children: React.ReactNode;

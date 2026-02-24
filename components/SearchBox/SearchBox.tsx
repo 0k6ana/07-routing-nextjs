@@ -1,4 +1,4 @@
-import css from "./SearchBox.module.css";
+import css from "./SerchBox.module.css";
 
 import { useEffect, useState } from "react";
 

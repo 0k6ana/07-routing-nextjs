@@ -1,25 +1,25 @@
-import css from './default.module.css';
+"use client";
 
 import { FetchTagNote } from '@/types/note';
-
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import css from './default.module.css';
 
 export default function Sidebar() {
-  const tags: FetchTagNote[] = [
-    'all',
-    'Todo',
-    'Work',
-    'Personal',
-    'Meeting',
-    'Shopping',
-  ];
+  const tags: FetchTagNote[] = ['all', 'Todo', 'Work', 'Personal', 'Meeting', 'Shopping'];
+
+  const pathname = usePathname();
+  const currentTag = pathname.split("/").pop() as FetchTagNote | undefined;
 
   return (
     <ul className={css.menuList}>
-      {tags.map((el, index) => (
-        <li key={index} className={css.menuItem}>
-          <Link href={`/notes/filter/${el}`} className={css.menuLink}>
-            {`${el === 'all' ? 'All notes' : el}`}
+      {tags.map((tag) => (
+        <li key={tag} className={css.menuItem}>
+          <Link
+            href={`/notes/filter/${tag}`}
+            className={`${css.menuLink} ${currentTag === tag ? css.active : ''}`}
+          >
+            {tag === 'all' ? 'All notes' : tag}
           </Link>
         </li>
       ))}

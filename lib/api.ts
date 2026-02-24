@@ -14,47 +14,21 @@ export async function fetchFilterNotes(
   page: number,
   search: string
 ): Promise<Answer> {
-  if (tag === 'all' && !search) {
-    const res = await axios.get<Answer>(
-      `https://notehub-public.goit.study/api/notes?&page=${page}&perPage=12`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+  const params = new URLSearchParams();
 
-    return res.data;
+  params.append('page', page.toString());
+  params.append('perPage', '12');
+
+  if (tag !== 'all') {
+    params.append('tag', tag);
   }
 
-  if (tag !== 'all' && !search) {
-    const res = await axios.get<Answer>(
-      `https://notehub-public.goit.study/api/notes?tag=${tag}&page=${page}&perPage=12`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return res.data;
-  }
-
-  if (tag === 'all' && search) {
-    const res = await axios.get<Answer>(
-      `https://notehub-public.goit.study/api/notes?search=${search}&page=${page}&perPage=12`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return res.data;
+  if (search.trim() !== '') {
+    params.append('search', search);
   }
 
   const res = await axios.get<Answer>(
-    `https://notehub-public.goit.study/api/notes?search=${search}&tag=${tag}&page=${page}&perPage=12`,
+    `https://notehub-public.goit.study/api/notes?${params.toString()}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -64,7 +38,6 @@ export async function fetchFilterNotes(
 
   return res.data;
 }
-
 export async function createNote(note: NewNote): Promise<Note> {
   const res = await axios.post<Note>(
     `https://notehub-public.goit.study/api/notes`,

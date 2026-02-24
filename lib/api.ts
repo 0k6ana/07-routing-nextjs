@@ -1,62 +1,104 @@
-import axios from "axios";
-import type { AxiosResponse } from "axios";
-import type { Note, Tag } from "@/types/note";
+import axios from 'axios';
 
-const BASE_URL = "https://notehub-public.goit.study/api";
+import { type Note, type NewNote, type FetchTagNote } from '@/types/note';
 
-const api = axios.create({
-  baseURL: BASE_URL,
-  headers: {
-    Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-  },
-});
-
-export interface FetchNotesParams {
-  page?: number;
-  perPage?: number;
-  search?: string;
-  tag?: string;
-}
-
-export interface FetchNotesResponse {
+interface Answer {
   notes: Note[];
   totalPages: number;
 }
 
-export interface CreateNotePayload {
-  title: string;
-  content: string | null;
-  tag: Tag;
+const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
+
+export async function fetchFilterNotes(
+  tag: FetchTagNote,
+  page: number,
+  search: string
+): Promise<Answer> {
+  if (tag === 'all' && !search) {
+    const res = await axios.get<Answer>(
+      `https://notehub-public.goit.study/api/notes?&page=${page}&perPage=12`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return res.data;
+  }
+
+  if (tag !== 'all' && !search) {
+    const res = await axios.get<Answer>(
+      `https://notehub-public.goit.study/api/notes?tag=${tag}&page=${page}&perPage=12`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return res.data;
+  }
+
+  if (tag === 'all' && search) {
+    const res = await axios.get<Answer>(
+      `https://notehub-public.goit.study/api/notes?search=${search}&page=${page}&perPage=12`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return res.data;
+  }
+
+  const res = await axios.get<Answer>(
+    `https://notehub-public.goit.study/api/notes?search=${search}&tag=${tag}&page=${page}&perPage=12`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.data;
 }
 
-export const fetchNotes = async (
-  params?: FetchNotesParams
-): Promise<FetchNotesResponse> => {
-  const { data } = await api.get("/notes", {
-    params: {
-      page: params?.page,
-      perPage: params?.perPage,
-      search: params?.search,
-      tag: params?.tag,
-    },
-  });
+export async function createNote(note: NewNote): Promise<Note> {
+  const res = await axios.post<Note>(
+    `https://notehub-public.goit.study/api/notes`,
+    note,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
-  return data;
-};
+  return res.data;
+}
 
-export const fetchNoteById = async (id: string): Promise<Note> => {
-  const { data }: AxiosResponse<Note> = await api.get(`/notes/${id}`);
-  return data;
-};
+export async function deleteNote(id: string): Promise<Note> {
+  const res = await axios.delete<Note>(
+    `https://notehub-public.goit.study/api/notes/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+}
 
-export const createNote = async (
-  payload: CreateNotePayload
-): Promise<Note> => {
-  const { data } = await api.post("/notes", payload);
-  return data;
-};
-
-export const deleteNote = async (id: string): Promise<Note> => {
-  const { data } = await api.delete(`/notes/${id}`);
-  return data;
-};
+export async function fetchNoteById(id: string): Promise<Note> {
+  const res = await axios.get<Note>(
+    `https://notehub-public.goit.study/api/notes/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+}
